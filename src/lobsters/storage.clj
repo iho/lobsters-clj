@@ -1,23 +1,25 @@
-(ns lobsters.storage) 
-(:require '[clojure.java.jdbc :as sql])
+(ns lobsters.storage
+  (:require [clojure.java.jdbc :as sql]))
 
 (def postgres-uri "postgresql://test_user:qwerty@localhost:5432/test_database")
 (def create-commands [(sql/create-table-ddl :users [[:id :serial :primary :key]
                                                     [:username :text]
-                                                    [:datetime :timestamp]])
+                                                    [:datetime :timestamp "without time zone default (now() at time zone 'utc')"]])
 
                       (sql/create-table-ddl :posts [[:id :serial :primary :key]
                                                     [:text :text]
+                                                    [:slug :text]
+                                                    [:link :text]
                                                     [:rating :int]
                                                     [:user_id :int "references users (id)"]
                                                     [:number_of_comments :int]
-                                                    [:datetime :timestamp]])
+                                                    [:datetime :timestamp "without time zone default (now() at time zone 'utc')"]])
 
                       (sql/create-table-ddl :tags [[:id :int :primary :key]
                                                    [:name :text]
                                                    [:slug :text]
                                                    [:count :int]
-                                                   [:datetime :timestamp]])
+                                                   [:datetime :timestamp "without time zone default (now() at time zone 'utc')"]])
 
                       (sql/create-table-ddl :comments [[:id :serial :primary :key]
                                                        [:text :text]
@@ -25,14 +27,15 @@
                                                        [:parent_id :int "references comments (id)"]
                                                        [:user_id :int "references users (id)"]
                                                        [:post_id :int "references posts (id)"]
-                                                       [:datetime :timestamp]])])
+                                                       [:datetime :timestamp "without time zone default (now() at time zone 'utc')"]])])
 (defn create-database [] (sql/db-do-commands postgres-uri create-commands))
-(defn drop-dabase [] (sql/db-do-commands postgres-uri [(sql/drop-table-ddl :comments)
-                                                       (sql/drop-table-ddl :tags)
-                                                       (sql/drop-table-ddl :posts)
-                                                       (sql/drop-table-ddl :users)]))
-
-
+(defn drop-database [] (sql/db-do-commands postgres-uri [(sql/drop-table-ddl :comments)
+                                                         (sql/drop-table-ddl :tags)
+                                                         (sql/drop-table-ddl :posts)
+                                                         (sql/drop-table-ddl :users)]))
+; (do
+;   (drop-database)
+;   (create-database))
 ; (sql/insert! postgres-uri :users {:username "Ihor"})
 ; (sql/query postgres-uri ["select * from users"])
 
