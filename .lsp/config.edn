@@ -1,0 +1,3 @@
+{:macro-defs {korma.core/defentity [:declaration :elements]}
+ :cljfmt {:indents {#re ".*" ns [[:inner 0] [:inner 1]]}}
+ :clj-kondo {:linters {:missing-docstring {:level :warning}}}}
